@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="Scripts/jquery-1.9.1.min.js"></script>
+    <script src="Scripts/jquery-ui-1.10.1.custom.min.js"></script>
+    <script src="Scripts/bootstrap.js"></script>
+    <script src="Scripts/knockout-2.2.0.js"></script>
+    <script src="Scripts/komapping.js"></script>
+  
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+    <link href="Content/site.css" rel="stylesheet" />
+</head>
+<body>
+    
+    <div class="container-fluid">
+
+        <form class="form-inline">
+            <div class="form-group">
+                <label class="sr-only" for="searchTermInput">Search Term</label>
+                <div class="input-group">
+                    <div class="input-group-addon">Search Term</div>
+                    <input type="text" class="form-control" id="searchTermInput" placeholder="Search Term">
+                   
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary searchTerm">Add</button>
+            <textarea cols="20" rows="5"></textarea>
+        </form>
+
+
+        <div role="tabpanel">
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs searchTabs" role="tablist">
+                <!--<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
+                <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Profile</a></li>
+                <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Messages</a></li>
+                <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>-->
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <!--<div role="tabpanel" class="tab-pane active" id="home">...</div>
+                <div role="tabpanel" class="tab-pane" id="profile">...</div>
+                <div role="tabpanel" class="tab-pane" id="messages">...</div>
+                <div role="tabpanel" class="tab-pane" id="settings">...</div>-->
+            </div>
+
+        </div>
+
+     
+
+    </div>
+    
+
+
+     
+</body>
+</html>
+<script type="text/javascript">
+    var term;
+    var url = "http://svcs.ebay.com/services/search/FindingService/v1";
+    url += "?OPERATION-NAME=findItemsByKeywords";
+    url += "&SERVICE-VERSION=1.0.0";
+    url += "&SECURITY-APPNAME=gavinsmi-9659-4b2a-9db8-3989388817f8";
+    url += "&GLOBAL-ID=EBAY-GB";
+    url += "&RESPONSE-DATA-FORMAT=JSON";
+    url += "&callback=localJsonpCallback";
+    url += "&REST-PAYLOAD";
+    url += "&keywords=";
+
+    $(function () {
+
+
+        $(document).on('click','.loadButton',function(){
+            
+            getResults('harry potter dvd');
+            
+        });
+
+        $(document).on('click', '.searchTerm', function () {
+
+           
+           term = $("#searchTermInput").val();
+
+
+            $("<li>", {
+                'attr': 'presentation'
+            }).append($("<a/>",
+                {
+                    'href': '#'+term.replace(' ',''),
+                    'aria-controls': term.replace(' ', ''),
+                    'role': 'tab',
+                    'data-toggle': 'tab'
+                }).text(term)).appendTo($(".searchTabs"));
+
+
+
+            $(".tab-content").append($("<div/>", { 'role': 'tabpanel', 'class': 'tab-pane active', 'id': term.replace(' ','') }));
+
+            getResults(term);
+        });
+
+    });
+
+    function getResults(keyword)
+    {
+
+        var s = document.createElement("script");
+        s.src = url + keyword;
+
+        $("head").append(s);
+    }
+
+
+    //?GLOBAL-ID=EBAY-GB&sortOrder=PricePlusShippingLowest&OPERATION-NAME=findItemsByKeywords&SERVICE-VERSION=1.0.0&SECURITY-APPNAME=gavinsmi-9659-4b2a-9db8-3989388817f8&RESPONSE-DATA-FORMAT=JSON&REST-PAYLOAD&keywords=";
+   
+    function localJsonpCallback(json) {
+        console.log(json);
+       
+        var results = json.findItemsByKeywordsResponse[0].searchResult[0];
+        var containerRow = $("<div/>", { 'class': 'col-lg-12' });
+        var header = $("<h3>").text('Search Results ')
+        var badge = $("<span class='badge'>" + results['@count'] + "</span>");
+
+        $(header).append($(badge));
+        $(containerRow).append(header);
+        $("#profile").append(containerRow);
+
+        $("<div/>", { 'class': 'row' }).appendTo($("div#" + term.replace(' ', '')));
+
+        for (var i = 0; i < results.item.length;i++)
+        {
+            var item = results.item[i];
+            var div = $("<div/>", { 'class': 'col-sm-12 col-md-2 col-lg-2' });
+
+
+            var anchor = $("<a />", { 'href': '#', 'class': 'thumbnail' });
+            
+
+            var img = $("<img/>", {
+                'src': item.galleryURL,
+                'width': '150px',
+                
+            }).css('height','75px').css('width','75px');
+
+            var caption = $("<div/>",{
+                'class':'caption',
+            }).append($("<p/>", { 'class': 'text-span' }).text(item.title));
+             
+        
+            
+
+
+            $(anchor).append($(img));
+            $(anchor).append($(caption));
+            $(div).append($(anchor));
+            var price = $("<div/>").text(item.sellingStatus[0].currentPrice[0].__value__ + " " + item.sellingStatus[0].currentPrice[0]['@currencyId']);
+            $(price).appendTo($(div));
+           $(div).appendTo($("div#" + term.replace(' ', '') + " .row"));
+            
+
+        }
+
+
+
+    }
+
+</script>
