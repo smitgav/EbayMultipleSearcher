@@ -13,21 +13,20 @@
 </head>
 <body>
     
-    <div class="container-fluid">
+    <div class="container">
 
-        <form class="form-inline">
-            <div class="form-group">
+        
                 <label class="sr-only" for="searchTermInput">Search Term</label>
                 <div class="input-group">
                     <div class="input-group-addon">Search Term</div>
                     <input type="text" class="form-control" id="searchTermInput" placeholder="Search Term">
                    
                 </div>
-            </div>
+       
             <button type="button" class="btn btn-primary searchTerm">Add</button>
-            <textarea cols="20" rows="5"></textarea>
-        </form>
-
+           
+       
+        <hr/>
 
         <div role="tabpanel">
 
@@ -150,15 +149,14 @@
             }).append($("<p/>", { 'class': 'text-span' }).text(item.title));
              
         
-            
-
-
             $(anchor).append($(img));
             $(anchor).append($(caption));
             $(div).append($(anchor));
             var price = $("<div/>").text(item.sellingStatus[0].currentPrice[0].__value__ + " " + item.sellingStatus[0].currentPrice[0]['@currencyId']);
-            $(price).appendTo($(div));
-           $(div).appendTo($("div#" + term.replace(' ', '') + " .row"));
+            $(price).appendTo($(anchor));
+
+
+            $(div).appendTo($("div#" + term.replace(' ', '') + " .row"));
             
 
         }
